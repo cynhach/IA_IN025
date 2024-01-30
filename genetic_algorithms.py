@@ -23,14 +23,13 @@ param = []
 bestParam = []
 bestDistance = 0
 
-evaluations = 500
+evaluations = 5
 current_evaluation = 0
 best_iteration = 0 
-somme = 0
 
 def step(robotId, sensors, position):
-    global evaluations, param, bestParam, bestDistance,current_evaluation,best_iteration,somme
-
+    global evaluations, param, bestParam, bestDistance,current_evaluation,best_iteration
+    somme = 0
     # cet exemple montre comment générer au hasard, et évaluer, des stratégies comportementales
     # Remarques:
     # - l'évaluation est ici la distance moyenne parcourue, mais on peut en imaginer d'autres
@@ -45,14 +44,12 @@ def step(robotId, sensors, position):
         else:
             best_iteration = 0
             current_evaluation = 0
-            somme = 0
         
     else :
         if rob.iterations % (400*3) == 0:
             if rob.iterations > 0:
                 dist = math.sqrt( math.pow( posInit[0] - position[0], 2 ) + math.pow( posInit[1] - position[1], 2 ) )
                 print ("Distance:",dist)
-                somme += dist
                 if dist > bestDistance:
                     bestDistance = dist
                     bestParam = param
@@ -65,14 +62,19 @@ def step(robotId, sensors, position):
                 param.append(random.randint(-1, 1))
             rob.controllers[robotId].set_position(posInit[0], posInit[1])
             rob.controllers[robotId].set_absolute_orientation(random.uniform(0,360))
-
-
+        print("somme de 3 evaluations = ",somme)
     # fonction de contrôle (qui dépend des entrées sensorielles, et des paramètres)
     translation = math.tanh ( param[0] + param[1] * sensors["sensor_front_left"]["distance"] + param[2] * sensors["sensor_front"]["distance"] + param[3] * sensors["sensor_front_right"]["distance"] );
     rotation = math.tanh ( param[4] + param[5] * sensors["sensor_front_left"]["distance"] + param[6] * sensors["sensor_front"]["distance"] + param[7] * sensors["sensor_front_right"]["distance"] );
 
     return translation, rotation
 
+
+def select() :
+
+
+
+def mutation(): 
 # =-=-=-=-=-=-=-=-=-= NE RIEN MODIFIER *APRES* CETTE LIGNE =-=-=-=-=-=-=-=-=-=
 
 number_of_robots = 1  # 8 robots identiques placés dans l'arène

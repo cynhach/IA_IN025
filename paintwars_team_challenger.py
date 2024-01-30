@@ -1,11 +1,11 @@
 # Projet "robotique" IA&Jeux 2021
 #
 # Binome:
-#  Prénom Nom: _________
-#  Prénom Nom: _________
+#  Prénom Nom: Warintara MUNSUP
+#  Prénom Nom: Cynthia HACHED
 
 def get_team_name():
-    return "[ team with no name ]" # à compléter (comme vous voulez)
+    return "[ WC ]" # à compléter (comme vous voulez)
 
 def step(robotId, sensors):
 
