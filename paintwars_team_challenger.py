@@ -19,5 +19,5 @@ def step(robotId, sensors):
 
     if sensors["sensor_front"]["isRobot"] == True and sensors["sensor_front"]["isSameTeam"] == False:
         enemy_detected_by_front_sensor = True # exemple de détection d'un robot de l'équipe adversaire (ne sert à rien)
-
+    # azihmfoa
     return translation, rotation
