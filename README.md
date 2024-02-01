@@ -36,3 +36,4 @@ Ce repository contient trois fichiers décrivant les sujets des deux TPs et le s
 * [instructions_projet.md](https://github.com/nekonaute/SU-LU3IN025-robots/blob/main/instructions_projet.md): description du projet.
 
 Bon courage !
+# IA_jeux
