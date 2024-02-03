@@ -1,5 +1,6 @@
 # Projet "robotique" IA&Jeux 2021
-#
+import braitenberg_loveWall
+import braitenberg_loveBot
 # Binome:
 #  Prénom Nom: Warintara MUNSUP
 #  Prénom Nom: Cynthia HACHED
@@ -71,4 +72,5 @@ def step(robotId, sensors):
         enemy_detected_by_front_sensor = True # exemple de détection d'un robot de l'équipe adversaire (ne sert à rien)
     """
     
+
     return translation, rotation

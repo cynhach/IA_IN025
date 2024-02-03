@@ -68,6 +68,7 @@ def step(robotId, sensors): # <<<<<<<<<------- fonction à modifier pour le TP1
         if sensors["sensor_front_right"]["distance_to_robot"]:
             rotation = random.uniform(-1,0)
 
+
     # Normaliser les valeurs pour rester dans les limites -1 à 1
     translation = max(0, min(translation, 1))
     rotation = max(-1, min(rotation, 1))
