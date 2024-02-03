@@ -11,7 +11,7 @@ def get_team_name():
 def step(robotId, sensors):
     enemy_detected_by_front_sensor = False
     
-    # à modifier 2 comportement braitenberg
+    # à modifier 2 comportement 
     if robotId in range(0,3): # stratégie qui permet d'avancer tout droit en evitant ainsi les obstacles 
         translation = 1 # vitesse de translation (entre -1 et +1)
         rotation = 0 # vitesse de rotation (entre -1 et +1)
@@ -19,7 +19,7 @@ def step(robotId, sensors):
             rotation = 0.5  # rotation vers la droite
         elif sensors["sensor_front_right"]["distance"] < 1:
             rotation = -0.5  # rotation vers la gauche
-    if robotId in range(3,6): #strategie qui êrmet de suivre chercher le mur 
+    if robotId in range(3,6): #strategie qui êrmet de suivre chercher le mur
         return braitenberg_loveWall.step(robotId,sensors)
         
     if robotId in range(6,8) : # strategie qui permet de suivre le robot ennemie 
