@@ -38,33 +38,28 @@ def step(robotId, sensors, position):
     # - la fonction de controle est une combinaison linéaire des senseurs, pondérés par les paramètres
 
     # toutes les 400 itérations: le robot est remis au centre de l'arène avec une orientation aléatoire
-    if current_evaluation > evaluations : 
-        if best_iteration < 1000:
-            param = bestParam
-            best_iteration += 1
-        else:
-            best_iteration = 0
-            current_evaluation = 0
-            somme = 0
-        
-    else :
-        if rob.iterations % (400*3) == 0:
+    if current_evaluations < evaluations:
+        if rob.iterations % (400 * 3) == 0:
             if rob.iterations > 0:
                 dist = math.sqrt( math.pow( posInit[0] - position[0], 2 ) + math.pow( posInit[1] - position[1], 2 ) )
                 print ("Distance:",dist)
-                somme += dist
                 if dist > bestDistance:
                     bestDistance = dist
                     bestParam = param
-                    print("best distance:", bestDistance)
-                    print("best parameters:", bestParam)
-                current_evaluation += 1
-                
+                    print("best distance :", bestDistance)
+                    print("best parameters :", bestParam)
+                current_evaluations += 1
             param = []
             for i in range(0, 8):
                 param.append(random.randint(-1, 1))
+
             rob.controllers[robotId].set_position(posInit[0], posInit[1])
-            rob.controllers[robotId].set_absolute_orientation(random.uniform(0,360))
+            # Set a random initial position
+            rob.controllers[robotId].set_absolute_orientation(random.uniform(0, 360))
+    else:
+        if best_iterations < 1000:
+            param = bestParam
+            best_iterations += 1
 
 
     # fonction de contrôle (qui dépend des entrées sensorielles, et des paramètres)

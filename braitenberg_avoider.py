@@ -55,16 +55,18 @@ def step(robotId, sensors): # <<<<<<<<<------- fonction à modifier pour le TP1
     translation = 1.0  # Vitesse de base
     rotation = 0.0  # Pas de rotation initiale
 
-    # Détecter et réagir aux obstacles
-    for sensor_key in sensors:
-        sensor = sensors[sensor_key]
-        if sensor["distance_to_robot"] < 0.8 or sensor["distance_to_wall"] < 0.8:
-            # Ralentir si un obstacle est proche
-            translation -= (1 - sensor["distance"]) * 0.5
-            if "left" in sensor_key:
-                rotation -= 1.5 * (1 - sensor["distance"])
-            elif "right" in sensor_key:
-                rotation += 1.5 * (1 - sensor["distance"])
+    if sensors["sensor_front"]["distance_to_wall"] < 1 or sensors["sensor_front_left"]["distance_to_wall"] < 1 or sensors["sensor_front_right"]["distance_to_wall"] < 1:
+        translation = 1
+        if sensors["sensor_front_left"]["distance_to_wall"] < 1:
+            rotation = random.uniform(0,1)
+        if sensors["sensor_front_right"]["distance_to_wall"] < 1:
+            rotation = random.uniform(-1,0)
+    if sensors["sensor_front"]["distance_to_robot"] or sensors["sensor_front_left"]["distance_to_robot"] or sensors["sensor_front_right"]["distance_to_robot"]:
+        translation = 1
+        if sensors["sensor_front_left"]["distance_to_robot"]:
+            rotation = random.uniform(0,1)
+        if sensors["sensor_front_right"]["distance_to_robot"]:
+            rotation = random.uniform(-1,0)
 
     # Normaliser les valeurs pour rester dans les limites -1 à 1
     translation = max(0, min(translation, 1))

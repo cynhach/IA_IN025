@@ -18,17 +18,16 @@ rob = 0
 
 simulation_mode = 1 # Simulation mode: realtime=0, fast=1, super_fast_no_render=2 -- pendant la simulation, la touche "d" permet de passer d'un mode à l'autre.
 
+current_evaluations = 0
 posInit = (400,400)
 param = []
 bestParam = []
 bestDistance = 0
-
+best_iterations = 0
 evaluations = 500
-current_evaluation = 0
-best_iteration = 0 
 
 def step(robotId, sensors, position):
-    global evaluations, param, bestParam, bestDistance,current_evaluation,best_iteration
+    global evaluations, current_evaluations, param, bestParam, bestDistance, best_iterations
 
     # cet exemple montre comment générer au hasard, et évaluer, des stratégies comportementales
     # Remarques:
@@ -37,36 +36,31 @@ def step(robotId, sensors, position):
     # - la fonction de controle est une combinaison linéaire des senseurs, pondérés par les paramètres
 
     # toutes les 400 itérations: le robot est remis au centre de l'arène avec une orientation aléatoire
-    if current_evaluation > evaluations : 
-        if best_iteration < 1000:
-            param = bestParam
-            best_iteration += 1
-        else:
-            best_iteration = 0
-            current_evaluation = 0
-        
-    else :
+    
+    # Génère de nouveaux paramètres aléatoires et reset sa position et son orientation
+    if current_evaluations < evaluations:
         if rob.iterations % 400 == 0:
-            if rob.iterations > 0:
-                dist = math.sqrt( math.pow( posInit[0] - position[0], 2 ) + math.pow( posInit[1] - position[1], 2 ) )
-                print ("Distance:",dist)
-                if dist > bestDistance:
-                    bestDistance = dist
-                    bestParam = param
-                    print("best distance:", bestDistance)
-                    print("best parameters:", bestParam)
-                current_evaluation += 1
-                
-            param = []
-            for i in range(0, 8):
-                param.append(random.randint(-1, 1))
-            rob.controllers[robotId].set_position(posInit[0], posInit[1])
-            rob.controllers[robotId].set_absolute_orientation(90)
+            dist = math.sqrt( math.pow( posInit[0] - position[0], 2 ) + math.pow( posInit[1] - position[1], 2 ) )
+            print ("Distance:",dist)
+            if dist > bestDistance:
+                bestDistance = dist
+                bestParam = param
+                print("best distance :", bestDistance)
+                print("best parameters :", bestParam)
+            current_evaluations += 1
+        param = []
+        for i in range(0, 8):
+            param.append(random.randint(-1, 1))
+        rob.controllers[robotId].set_position(posInit[0], posInit[1])
+        rob.controllers[robotId].set_absolute_orientation(90)
+    else:
+        if best_iterations < 1000:
+            param = bestParam
+            best_iterations += 1
 
-
-    # fonction de contrôle (qui dépend des entrées sensorielles, et des paramètres)
     translation = math.tanh ( param[0] + param[1] * sensors["sensor_front_left"]["distance"] + param[2] * sensors["sensor_front"]["distance"] + param[3] * sensors["sensor_front_right"]["distance"] );
     rotation = math.tanh ( param[4] + param[5] * sensors["sensor_front_left"]["distance"] + param[6] * sensors["sensor_front"]["distance"] + param[7] * sensors["sensor_front_right"]["distance"] );
+            
 
     return translation, rotation
 

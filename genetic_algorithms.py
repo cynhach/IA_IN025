@@ -23,13 +23,14 @@ param = []
 bestParam = []
 bestDistance = 0
 
-evaluations = 5
+evaluations = 500
 current_evaluation = 0
 best_iteration = 0 
+somme = 0
 
 def step(robotId, sensors, position):
-    global evaluations, param, bestParam, bestDistance,current_evaluation,best_iteration
-    somme = 0
+    global evaluations, param, bestParam, bestDistance,current_evaluation,best_iteration,somme
+
     # cet exemple montre comment générer au hasard, et évaluer, des stratégies comportementales
     # Remarques:
     # - l'évaluation est ici la distance moyenne parcourue, mais on peut en imaginer d'autres
@@ -37,44 +38,35 @@ def step(robotId, sensors, position):
     # - la fonction de controle est une combinaison linéaire des senseurs, pondérés par les paramètres
 
     # toutes les 400 itérations: le robot est remis au centre de l'arène avec une orientation aléatoire
-    if current_evaluation > evaluations : 
-        if best_iteration < 1000:
-            param = bestParam
-            best_iteration += 1
-        else:
-            best_iteration = 0
-            current_evaluation = 0
-        
-    else :
-        if rob.iterations % (400*3) == 0:
+    if current_evaluations < evaluations:
+        if rob.iterations % (400 * 3) == 0:
             if rob.iterations > 0:
                 dist = math.sqrt( math.pow( posInit[0] - position[0], 2 ) + math.pow( posInit[1] - position[1], 2 ) )
                 print ("Distance:",dist)
                 if dist > bestDistance:
                     bestDistance = dist
                     bestParam = param
-                    print("best distance:", bestDistance)
-                    print("best parameters:", bestParam)
-                current_evaluation += 1
-                
+                    print("best distance :", bestDistance)
+                    print("best parameters :", bestParam)
+                current_evaluations += 1
             param = []
             for i in range(0, 8):
                 param.append(random.randint(-1, 1))
+
             rob.controllers[robotId].set_position(posInit[0], posInit[1])
-            rob.controllers[robotId].set_absolute_orientation(random.uniform(0,360))
-        print("somme de 3 evaluations = ",somme)
+            # Set a random initial position
+            rob.controllers[robotId].set_absolute_orientation(random.uniform(0, 360))
+    else:
+        if best_iterations < 1000:
+            param = bestParam
+            best_iterations += 1
+
     # fonction de contrôle (qui dépend des entrées sensorielles, et des paramètres)
     translation = math.tanh ( param[0] + param[1] * sensors["sensor_front_left"]["distance"] + param[2] * sensors["sensor_front"]["distance"] + param[3] * sensors["sensor_front_right"]["distance"] );
     rotation = math.tanh ( param[4] + param[5] * sensors["sensor_front_left"]["distance"] + param[6] * sensors["sensor_front"]["distance"] + param[7] * sensors["sensor_front_right"]["distance"] );
 
     return translation, rotation
 
-
-def select() :
-
-
-
-def mutation(): 
 # =-=-=-=-=-=-=-=-=-= NE RIEN MODIFIER *APRES* CETTE LIGNE =-=-=-=-=-=-=-=-=-=
 
 number_of_robots = 1  # 8 robots identiques placés dans l'arène

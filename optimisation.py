@@ -36,14 +36,14 @@ def step(robotId, sensors, position):
 
     # toutes les 400 itérations: le robot est remis au centre de l'arène avec une orientation aléatoire
     if rob.iterations % 400 == 0:
-            if rob.iterations > 0:
-                dist = math.sqrt( math.pow( posInit[0] - position[0], 2 ) + math.pow( posInit[1] - position[1], 2 ) )
-                print ("Distance:",dist)
-            param = []
-            for i in range(0, 8):
-                param.append(random.randint(-1, 1))
-            rob.controllers[robotId].set_position(posInit[0], posInit[1])
-            rob.controllers[robotId].set_absolute_orientation(90)
+        if rob.iterations > 0:
+            dist = math.sqrt( math.pow( posInit[0] - position[0], 2 ) + math.pow( posInit[1] - position[1], 2 ) )
+            print ("Distance:",dist)
+        param = []
+        for i in range(0, 8):
+            param.append(random.randint(-1, 1))
+        rob.controllers[robotId].set_position(posInit[0], posInit[1])
+        rob.controllers[robotId].set_absolute_orientation(90)
 
     # fonction de contrôle (qui dépend des entrées sensorielles, et des paramètres)
     translation = math.tanh ( param[0] + param[1] * sensors["sensor_front_left"]["distance"] + param[2] * sensors["sensor_front"]["distance"] + param[3] * sensors["sensor_front_right"]["distance"] );
