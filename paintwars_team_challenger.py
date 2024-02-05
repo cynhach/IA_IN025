@@ -35,7 +35,7 @@ def step(robotId, sensors):
     rotation = 0
     # Les robots qui ont un id entre 0 et 2 (compris) vont aller tout droit en évitant les obstacles
     # Architecture de subsomption
-    if robotId in range(0,3): 
+    if robotId in range(0,2): 
         # va tout droit tant qu'aucun obstacle est rencontré
         translation = 1
         rotation = 0 
@@ -44,7 +44,7 @@ def step(robotId, sensors):
             return braitenberg_avoider.step(robotId, sensors)
 
     # Les robots qui ont un id 3 et 4 longent les murs en évitant les robots
-    if robotId in range(3,6): 
+    if robotId in range(2,6): 
         translation = 1
         rotation = 0
         if sensors["sensor_front_left"]["distance"] < 1 or sensors["sensor_front"]["distance"] < 1 or sensors["sensor_front_right"]["distance"] < 1:

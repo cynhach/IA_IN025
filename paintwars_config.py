@@ -2,8 +2,8 @@
 # 2021-03-31
 
 # Arena
-import paintwars_arena
-get_arena = paintwars_arena.get_arena
+import paintwars_arena_eval
+get_arena = paintwars_arena_eval.get_arena
 arenaIndexSelector = 0 # numéro de l'arène, entre 0 et 4
 
 # Starting position
