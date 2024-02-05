@@ -57,7 +57,7 @@ def step(robotId, sensors): # <<<<<<<<<------- fonction à modifier pour le TP1
 
     # Détecter et réagir aux obstacles
     translation = 1 * sensors["sensor_front"]["distance"]
-    rotation = (-1) * sensors["sensor_front_left"]["distance"] + (1) * sensors["sensor_front_right"]["distance"]
+    rotation = (1) * sensors["sensor_front_left"]["distance"] + (-1) * sensors["sensor_front_right"]["distance"]
 
     # Normaliser les valeurs pour rester dans les limites -1 à 1
     translation = max(0, min(translation, 1))
