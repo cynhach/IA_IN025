@@ -18,50 +18,105 @@ rob = 0
 
 simulation_mode = 1 # Simulation mode: realtime=0, fast=1, super_fast_no_render=2 -- pendant la simulation, la touche "d" permet de passer d'un mode à l'autre.
 
-posInit = (400,400)
-param = []
-bestParam = []
-bestDistance = 0
+# CONSTANTES
+MU = 5
+LAMBDA = 20
+MUTATION_RATE = 0.2
 
-evaluations = 500
+# Variables globales
 current_evaluation = 0
-best_iteration = 0 
-somme = 0
+bestScore = 0
+bestParam = []
+population = []
+
+def get_extended_sensors(sensors):
+    for key in sensors:
+        sensors[key]["distance_to_robot"] = 1.0
+        sensors[key]["distance_to_wall"] = 1.0
+        if sensors[key]["isRobot"] == True:
+            sensors[key]["distance_to_robot"] = sensors[key]["distance"]
+        else:
+            sensors[key]["distance_to_wall"] = sensors[key]["distance"]
+    return sensors
+
+# Sélectionne des individus dans la population en fonction de leurs scores relatifs
+def selection(population, scores):
+    selected = []
+    total_score = sum(scores)
+    relative_scores = [score / total_score for score in scores]     # performance individuelle
+    cumulative_scores = [sum(relative_scores[:i+1]) for i in range(len(relative_scores))]       # fitness
+    for _ in range(MU):
+        r = random.random()     # Nombre aléatoire en 0 et 1
+        for i in range(len(cumulative_scores)):
+            if r <= cumulative_scores[i]:
+                selected.append(population[i])
+    return selected
+
+# Effectue une mutation sur un individu de la population
+def mutation(robot, rate):
+    mutated = robot.copy()
+    for i in range(len(mutated)):
+        if random.random() < rate:
+            mutated[i] += random.uniform(-0.2, 0.2)
+            mutated[i] = max(min(mutated[i], 1), -1)        # Garantit qu'on reste dans la plage (-1, +1)
+    return mutated
+
+# Effectue une opération de croisement entre deux individus
+def crossover(parent1, parent2):
+    child = []
+    for i in range(len(parent1)):
+        child.append((parent1[i] + parent2[i]) / 2)
+    return child
+
+def individual_score(individual, sensors):
+    translation = math.tanh(individual[0] + individual[1] * sensors["sensor_front_left"]["distance"] + individual[2] * sensors["sensor_front"]["distance"] + individual[3] * sensors["sensor_front_right"]["distance"])
+    rotation = math.tanh(individual[4] + individual[5] * sensors["sensor_front_left"]["distance"] + individual[6] * sensors["sensor_front"]["distance"] + individual[7] * sensors["sensor_front_right"]["distance"])
+    
+    score = translation * (1 - abs(rotation))  # Encourage le déplacement en ligne droite
+    
+    return score
+
 
 def step(robotId, sensors, position):
-    global evaluations, param, bestParam, bestDistance,current_evaluation,best_iteration,somme
+    global current_evaluation, population, bestParam, bestScore
 
-    # cet exemple montre comment générer au hasard, et évaluer, des stratégies comportementales
-    # Remarques:
-    # - l'évaluation est ici la distance moyenne parcourue, mais on peut en imaginer d'autres
-    # - la liste "param", définie ci-dessus, permet de stocker les paramètres de la fonction de contrôle
-    # - la fonction de controle est une combinaison linéaire des senseurs, pondérés par les paramètres
-
-    # toutes les 400 itérations: le robot est remis au centre de l'arène avec une orientation aléatoire
-    if current_evaluations < evaluations:
-        if rob.iterations % (400 * 3) == 0:
-            if rob.iterations > 0:
-                dist = math.sqrt( math.pow( posInit[0] - position[0], 2 ) + math.pow( posInit[1] - position[1], 2 ) )
-                print ("Distance:",dist)
-                if dist > bestDistance:
-                    bestDistance = dist
-                    bestParam = param
-                    print("best distance :", bestDistance)
-                    print("best parameters :", bestParam)
-                current_evaluations += 1
-            param = []
-            for i in range(0, 8):
-                param.append(random.randint(-1, 1))
-
-            rob.controllers[robotId].set_position(posInit[0], posInit[1])
-            # Set a random initial position
-            rob.controllers[robotId].set_absolute_orientation(random.uniform(0, 360))
+    if len(population) == 0:
+        population = [[random.uniform(0,1) for _ in range(6)] for _ in range(MU)]
+        for p in population:
+            translation = math.tanh ( p[0] + p[1] * sensors["sensor_front_left"]["distance"] + p[2] * sensors["sensor_front"]["distance"] + p[3] * sensors["sensor_front_right"]["distance"] )
+            if translation > 0:
+                param = p
+                break
+        param = population[0]
     else:
-        if best_iterations < 1000:
-            param = bestParam
-            best_iterations += 1
+        param = population[current_evaluation % LAMBDA]
 
-    # fonction de contrôle (qui dépend des entrées sensorielles, et des paramètres)
+    translation = math.tanh ( param[0] + param[1] * sensors["sensor_front_left"]["distance"] + param[2] * sensors["sensor_front"]["distance"] + param[3] * sensors["sensor_front_right"]["distance"] );
+    rotation = math.tanh ( param[4] + param[5] * sensors["sensor_front_left"]["distance"] + param[6] * sensors["sensor_front"]["distance"] + param[7] * sensors["sensor_front_right"]["distance"] );
+
+    # Calcul du score actuel en fonction de la translation et de la rotation
+    current_score = translation*(1 - abs(rotation))       # encourage le déplacement en ligne droite
+    # Mise à jour du meilleur score et des meilleurs paramètres
+    if current_score > bestScore:
+        bestScore = current_score
+        bestParam = param.copy()
+    
+    current_evaluation += 1
+
+    # Calcul des scores pour chaque individu deans la population
+    Scores = [individual_score(individual, sensors) for individual in population]
+
+    selected_parents = selection(population, Scores)
+    # Création d'une nouvelle population
+    new_population = []
+    for _ in range(LAMBDA):
+        parent1 = random.choice(selected_parents)
+        parent2 = random.choice(selected_parents)
+        child = crossover(parent1, parent2)
+        mutated_child = mutation(child, MUTATION_RATE)
+        new_population.append(mutated_child)
+
+    population = new_population
     translation = math.tanh ( param[0] + param[1] * sensors["sensor_front_left"]["distance"] + param[2] * sensors["sensor_front"]["distance"] + param[3] * sensors["sensor_front_right"]["distance"] );
     rotation = math.tanh ( param[4] + param[5] * sensors["sensor_front_left"]["distance"] + param[6] * sensors["sensor_front"]["distance"] + param[7] * sensors["sensor_front_right"]["distance"] );
 

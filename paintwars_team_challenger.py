@@ -10,6 +10,7 @@ import braitenberg_hateWall
 import braitenberg_loveWall
 import braitenberg_hateBot      # Pour les robots de la meme equipe
 import braitenberg_avoider
+import genetic_algorithms
 
 def get_team_name():
     return "WC"
@@ -27,6 +28,8 @@ def get_extended_sensors(sensors):
 def step(robotId, sensors):
     # Chacun de nos robots a une stratégie prédéfinie
     sensors = get_extended_sensors(sensors)
+
+    #translation, rotation = genetic_algorithms.step(robotId, sensors)      # Application de l'algortihme génétique
 
     translation = 0
     rotation = 0

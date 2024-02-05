@@ -28,6 +28,16 @@ current_evaluation = 0
 best_iteration = 0 
 somme = 0
 
+def get_extended_sensors(sensors):
+    for key in sensors:
+        sensors[key]["distance_to_robot"] = 1.0
+        sensors[key]["distance_to_wall"] = 1.0
+        if sensors[key]["isRobot"] == True:
+            sensors[key]["distance_to_robot"] = sensors[key]["distance"]
+        else:
+            sensors[key]["distance_to_wall"] = sensors[key]["distance"]
+    return sensors
+
 def step(robotId, sensors, position):
     global evaluations, param, bestParam, bestDistance,current_evaluation,best_iteration,somme
 
